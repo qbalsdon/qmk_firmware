@@ -8,18 +8,18 @@ I'm still hammering out the name
 
 ### Working `qmk doctor` output:
 
-> Ψ QMK Doctor is checking your environment.
-> Ψ CLI version: 0.1.0
-> Ψ QMK home: /Users/quba/qmk_firmware
-> Ψ Detected macOS 11.4.
-> Ψ All dependencies are installed.
-> Ψ Found arm-none-eabi-gcc version 9.2.1
-> Ψ Found avr-gcc version 9.3.0
-> ⚠ We do not recommend avr-gcc newer than 8. Downgrading to 8.x is recommended.
-> Ψ Found avrdude version 6.3
-> Ψ Found dfu-util version 0.10
-> Ψ Found dfu-programmer version 0.7.2
-> Ψ Submodules are up to date.
+> Ψ QMK Doctor is checking your environment.<br/>
+> Ψ CLI version: 0.1.0<br/>
+> Ψ QMK home: /Users/quba/qmk_firmware<br/>
+> Ψ Detected macOS 11.4.<br/>
+> Ψ All dependencies are installed.<br/>
+> Ψ Found arm-none-eabi-gcc version 9.2.1<br/>
+> Ψ Found avr-gcc version 9.3.0<br/>
+> ⚠ We do not recommend avr-gcc newer than 8. Downgrading to 8.x is recommended.<br/>
+> Ψ Found avrdude version 6.3<br/>
+> Ψ Found dfu-util version 0.10<br/>
+> Ψ Found dfu-programmer version 0.7.2<br/>
+> Ψ Submodules are up to date.<br/>
 > Ψ QMK is ready to go, but minor problems were found
 
 
