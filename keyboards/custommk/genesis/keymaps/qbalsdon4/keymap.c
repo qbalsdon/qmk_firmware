@@ -22,7 +22,7 @@
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //TODO: ADB_REBOOT(PURPLE?), ADB_FLIP(PURPLE?), ADB_ANIMATION (PURPLE?), ADB_TB_SETTINGS, ADB_TB_MENU, MENU
-//      A11y_SCANNER
+//      A11y_SCANNER, SYSTEM font_scale [1.0, 1.15, 1.3, 0.85]
 	[LAYER_ADB] = LAYOUT_ortho_5x4(
 			ADB_TB_CLICK   , LAYER_CYCLE     , HOVER           , ADB_TB_MUTE       ,
 			ADB_UNLOCK     , ADB_TALKBACK    , _______         , ADB_SCRNREC       ,

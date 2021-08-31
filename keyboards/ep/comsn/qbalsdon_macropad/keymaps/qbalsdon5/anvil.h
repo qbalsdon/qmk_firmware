@@ -17,8 +17,21 @@
 #define ADB_TB_FOCUS      HYPR(KC_F9)
 #define ADB_TB_CURTAIN    HYPR(KC_BSLASH)
 #define ADB_TB_CLICK      HYPR(KC_QUOTE)
-#define ADB_RECORD_OFF    HYPR(KC_M)
-#define ADB_RECORD_ON     HYPR(KC_N)
+#define ADB_RECORD_OFF    HYPR(KC_M) // ADB_SCRNREC
+#define ADB_RECORD_ON     HYPR(KC_N) // ADB_SCRNREC
+/* TODO:
+     ADB_REBOOT(PURPLE?),
+     ADB_FLIP(PURPLE?),
+     ADB_ANIMATION (PURPLE?),
+     ADB_TB_SETTINGS,
+     ADB_TB_MENU,
+     SETTINGS MENU
+     A11y_SCANNER,
+     FONT SCALE : SYSTEM font_scale [0.85, 1.0, 1.15, 1.3]
+     COLOUR INVERSION: SECURE accessibility_display_inversion_enabled [0.0, 1.0]
+     Force RTL: GLOBAL debug.force_rtl [None, 1.0, 0.0]
+     Disable Animations (BASH script exists)
+*/
 
 #define ADB_UNLOCK_SCRIPT        "sh unlockWithSwipe -p 314159"
 #define ADB_TALKBACK_SCRIPT      "sh talkback"
