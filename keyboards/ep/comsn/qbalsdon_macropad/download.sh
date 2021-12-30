@@ -14,6 +14,3 @@ mkdir keymaps
 mkdir keymaps/default
 
 curl -o keymaps/default/keymap.c https://raw.githubusercontent.com/e11i0t23/qmk_firmware/qbal_macro/keyboards/ep/comsn/qbalsdon_macropad/keymaps/default/keymap.c
-
-
-1234554321123455432112345
