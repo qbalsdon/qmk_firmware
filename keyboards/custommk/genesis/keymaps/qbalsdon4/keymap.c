@@ -27,41 +27,36 @@
 #define DOTA_HOVER       LT(LAYER_HOVER, DOTA_STORE)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+	[LAYER_DOTA] = LAYOUT_ortho_5x4(
+	  DOTA_PAUSE        ,TO(LAYER_RASPBERRY), DOTA_HOVER        , DOTA_TYPE_ITEM    ,
+		DOTA_SPELL1       , DOTA_SPELL2       , DOTA_SPELL3       , DOTA_ULTIMATE     ,
+		DOTA_ITEM_01      , DOTA_ITEM_02      , DOTA_ITEM_03      , DOTA_TP           ,
+		DOTA_ITEM_04      , DOTA_ITEM_05      , DOTA_ITEM_06      , DOTA_CHATWHEEL    ,
+		DOTA_FOCUS_UNITS  , DOTA_FOCUS_HERO   , DOTA_SHIFT        , DOTA_DENY         ),
+  [LAYER_RASPBERRY] = LAYOUT_ortho_5x4(
+		RASPBERRY_01      , TO(LAYER_ANDROID) , HOVER             , RASPBERRY_02      ,
+		RASPBERRY_03      , RASPBERRY_04      , RASPBERRY_05      , RASPBERRY_06      ,
+		RASPBERRY_07      , RASPBERRY_08      , RASPBERRY_09      , RASPBERRY_10      ,
+		RASPBERRY_11      , RASPBERRY_12      , RASPBERRY_13      , RASPBERRY_14      ,
+		RASPBERRY_15      , RASPBERRY_16      , RASPBERRY_17      , RASPBERRY_18      ),
 	[LAYER_ANDROID] = LAYOUT_ortho_5x4(
 		HYPR(ANVIL_MAP_01), TO(LAYER_SCRIPTS) , HOVER             , HYPR(ANVIL_MAP_02),
-		KC_LSHIFT, KC_LALT, KC_D, LGUI(KC_R),
-		LCTL(LALT(KC_LSHIFT)), LGUI(KC_LALT), KC_P, KC_R ,
-		DEMO_01, LGUI(LALT(KC_R)), HYPR(ANVIL_MAP_13), DEMO_02,
+		HYPR(ANVIL_MAP_03), HYPR(ANVIL_MAP_04), HYPR(ANVIL_MAP_05), HYPR(ANVIL_MAP_06),
+		HYPR(ANVIL_MAP_07), HYPR(ANVIL_MAP_08), HYPR(ANVIL_MAP_09), HYPR(ANVIL_MAP_10),
+		HYPR(ANVIL_MAP_11), HYPR(ANVIL_MAP_12), HYPR(ANVIL_MAP_13), HYPR(ANVIL_MAP_14),
 		HYPR(ANVIL_MAP_15), HYPR(ANVIL_MAP_16), HYPR(ANVIL_MAP_17), HYPR(ANVIL_MAP_18)),
-
 	[LAYER_SCRIPTS] = LAYOUT_ortho_5x4(
 		LCAG(ANVIL_MAP_01), TO(LAYER_DEMO)    , HOVER             , LCAG(ANVIL_MAP_02),
 		LCAG(ANVIL_MAP_03), LCAG(ANVIL_MAP_04), LCAG(ANVIL_MAP_05), LCAG(ANVIL_MAP_06),
 		LCAG(ANVIL_MAP_07), LCAG(ANVIL_MAP_08), LCAG(ANVIL_MAP_09), LCAG(ANVIL_MAP_10),
 		LCAG(ANVIL_MAP_11), LCAG(ANVIL_MAP_12), LCAG(ANVIL_MAP_13), LCAG(ANVIL_MAP_14),
 		LCAG(ANVIL_MAP_15), LCAG(ANVIL_MAP_16), LCAG(ANVIL_MAP_17), LCAG(ANVIL_MAP_18)),
-
 	[LAYER_DEMO] = LAYOUT_ortho_5x4(
 		DEMO_01           , TO(LAYER_DOTA)    , HOVER             , DEMO_02           ,
 		DEMO_03           , DEMO_04           , DEMO_05           , DEMO_06           ,
 		DEMO_07           , DEMO_08           , DEMO_09           , DEMO_10           ,
 		DEMO_11           , DEMO_12           , DEMO_13           , DEMO_14           ,
 		DEMO_15           , DEMO_16           , DEMO_17           , DEMO_18           ),
-
-	[LAYER_DOTA] = LAYOUT_ortho_5x4(
-	    DOTA_PAUSE        ,TO(LAYER_RASPBERRY), DOTA_HOVER        , DOTA_TYPE_ITEM    ,
-		DOTA_SPELL1       , DOTA_SPELL2       , DOTA_SPELL3       , DOTA_ULTIMATE     ,
-		DOTA_ITEM_01      , DOTA_ITEM_02      , DOTA_ITEM_03      , DOTA_TP           ,
-		DOTA_ITEM_04      , DOTA_ITEM_05      , DOTA_ITEM_06      , DOTA_CHATWHEEL    ,
-		DOTA_FOCUS_UNITS  , DOTA_FOCUS_HERO   , DOTA_SHIFT        , DOTA_DENY         ),
-
-    [LAYER_RASPBERRY] = LAYOUT_ortho_5x4(
-		RASPBERRY_01      , TO(LAYER_ANDROID) , HOVER             , RASPBERRY_02      ,
-		RASPBERRY_03      , RASPBERRY_04      , RASPBERRY_05      , RASPBERRY_06      ,
-		RASPBERRY_07      , RASPBERRY_08      , RASPBERRY_09      , RASPBERRY_10      ,
-		RASPBERRY_11      , RASPBERRY_12      , RASPBERRY_13      , RASPBERRY_14      ,
-		RASPBERRY_15      , RASPBERRY_16      , RASPBERRY_17      , RASPBERRY_18      ),
-
 	[LAYER_HOVER] = LAYOUT_ortho_5x4(
 		_______           , _______           , _______           , _______           ,
 		_______           , _______           , _______           , _______           ,
@@ -251,9 +246,9 @@ uint16_t* getLayerSecondaryColour(void) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-	// if (!record->event.pressed) {
-	// 	return true;
-	// }
+	if (!record->event.pressed) {
+		return true;
+	}
 	switch (keycode) {
 		case DEMO_01:
 			if (record->event.pressed) {
@@ -298,6 +293,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		    send_string("wpa_passphrase RouterOfEvil \"Zuhlke1234$\" > ");
 		break;
 		case RASPBERRY_12:
+				send_string("iwlist wlan0 scan");
 		break;
 		case RASPBERRY_13:
 		break;

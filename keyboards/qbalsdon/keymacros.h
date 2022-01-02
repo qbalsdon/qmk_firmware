@@ -1,11 +1,11 @@
 #ifndef __keymacros_h
 #define __keymacros_h
 
-#define LAYER_ANDROID 0
-#define LAYER_SCRIPTS 1
-#define LAYER_DEMO 2
-#define LAYER_DOTA 3
-#define LAYER_RASPBERRY 4
+#define LAYER_ANDROID 2
+#define LAYER_SCRIPTS 3
+#define LAYER_DEMO 4
+#define LAYER_DOTA 0
+#define LAYER_RASPBERRY 1
 #define LAYER_HOVER 5
 
 //https://beta.docs.qmk.fm/using-qmk/simple-keycodes/keycodes

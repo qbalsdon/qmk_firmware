@@ -125,9 +125,10 @@ void update_element(void) {
   }
 }
 
-void oled_render_layer_state(void) {
+void oled_render_layer_state(uint8_t layer) {
+// void oled_task_user(void) {
     oled_write_P(PSTR("Layer: "), false);
-    switch (get_highest_layer(layer_state)) {
+    switch (layer) {
         case LAYER_ANDROID:
             oled_write_ln_P(PSTR("Android\n"), false);
             break;
@@ -182,7 +183,7 @@ void oled_refresh(void) {
     #ifdef OLED_ENABLE
     oled_clear();
     // oled_render_logo();
-    oled_render_layer_state();
+    oled_render_layer_state(biton32(layer_state));
     #endif
 }
 
@@ -217,9 +218,11 @@ void encoder_map_dota(uint8_t key_code) {
         break;
         case ANVIL_MAP_36: // encoder 3 clockwise
             dota_item_increase();
+            oled_refresh();
         break;
         case ANVIL_MAP_37: // encoder 3 anti clockwise
             dota_item_decrease();
+            oled_refresh();
         break;
     }
 }
@@ -263,7 +266,7 @@ bool encoder_update_user(uint8_t encoder_index, bool clockwise) {
             perform_encoder_action_with_code(key_code);
             break;
         }
-        oled_refresh();
+    //oled_refresh();
     return true;
 }
 
@@ -326,24 +329,19 @@ void keyboard_post_init_user(void) {
 // }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-    oled_refresh();
-    rgblight_set_layer_state(1,  layer_state_cmp(state, 0));
-    rgblight_set_layer_state(2,  layer_state_cmp(state, 1));
-    rgblight_set_layer_state(3,  layer_state_cmp(state, 2));
-    rgblight_set_layer_state(4,  layer_state_cmp(state, 3));
-    // rgblight_set_layer_state(2, layer_state_cmp(state, 1));
-    // rgblight_set_layer_state(3, layer_state_cmp(state, 2));
-    // rgblight_set_layer_state(4, layer_state_cmp(state, 3));
-    // rgblight_set_layer_state(5, layer_state_cmp(state, 4));
-    // rgblight_set_layer_state(6, layer_state_cmp(state, 5));Arcane BootsArcane BootsArcane Boots
+    rgblight_set_layer_state(1,  layer_state_cmp(state, LAYER_ANDROID));
+    rgblight_set_layer_state(2,  layer_state_cmp(state, LAYER_ALT));
+    rgblight_set_layer_state(3,  layer_state_cmp(state, LAYER_DOTA));
+    rgblight_set_layer_state(4,  layer_state_cmp(state, LAYER_HOVER));
+    oled_render_layer_state(get_highest_layer(state));
     return state;
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    oled_refresh();
     if (!record->event.pressed) {
         return true;
     }
+    //oled_refresh();
     switch (keycode) {
         case DOTA_TYPE_ITEM:
             //tap_code16(LGUI(KC_A));
@@ -360,7 +358,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 };
 
 void suspend_wakeup_init_user(void) {
-    oled_refresh();
+    //oled_refresh();
 }
 
 void suspend_power_down_user(void) {
