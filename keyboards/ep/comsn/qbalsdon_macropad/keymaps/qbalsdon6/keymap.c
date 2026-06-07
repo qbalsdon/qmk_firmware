@@ -17,350 +17,477 @@
 
 #include <string.h>
 
-#include "images.h"
 #include "keymacros.h"
-#include "dota.h"
 
-#define LAYER_ANDROID 0
-#define LAYER_ALT 1
-#define LAYER_DOTA 2
-#define LAYER_HOVER 3
+#define DEMO_PLAIN_COUNT 25
+#define DEMO_PLAIN_IS(kc) ((kc) >= DEMO_H && (kc) <= DEMO_6)
 
-#define ANDROID_HOVER  LT(LAYER_HOVER, HYPR(ANVIL_MAP_06))
-#define ALT_HOVER      LT(LAYER_HOVER, LCAG(ANVIL_MAP_06))
-#define DOTA_HOVER     LT(LAYER_HOVER, DOTA_STORE)
+typedef struct {
+    char     label;
+    uint16_t keycode;
+} demo_key_t;
 
-#define ENCODER_1 0
-#define ENCODER_2 1
-#define ENCODER_3 2
-
-enum custom_keycodes {
-    DOTA_TYPE_ITEM = SAFE_RANGE,
-    SCREEN_OFF,
-    SCREEN_ON,
-    //OTHERS HERE
+static const demo_key_t demo_plain_keys[DEMO_PLAIN_COUNT] = {
+    {'H', KC_H}, {'I', KC_I}, {'J', KC_J}, {'K', KC_K}, {'L', KC_L},
+    {'M', KC_M}, {'N', KC_N}, {'O', KC_O}, {'P', KC_P}, {'Q', KC_Q},
+    {'R', KC_R}, {'S', KC_S}, {'T', KC_T}, {'U', KC_U}, {'V', KC_V},
+    {'W', KC_W}, {'X', KC_X}, {'Y', KC_Y}, {'Z', KC_Z},
+    {'1', KC_1}, {'2', KC_2}, {'3', KC_3}, {'4', KC_4}, {'5', KC_5}, {'6', KC_6},
 };
 
+static uint16_t demo_last_key  = 0;
+static uint16_t demo_last_time = 0;
+static uint8_t  demo_rgb_hue[3] = {0, 85, 170};
+
+#define ANVIL_KEYMAP( \
+    k01, k02, k03, k04, \
+         k12, k13, k14, \
+    k20, k21, k22, k23, k24, \
+    k30, k31, k32, k33, k34, \
+    k40, k41, k42, k43, k44, \
+    k50, k51, k52, k53, k54, \
+    k60, k61, k62, k63, k64 \
+) \
+LAYOUT( \
+    k01, k02, k03, k04, \
+         k12, k13, k14, \
+    k20, k21, k22, k23, k24, \
+    k30, k31, k32, k33, k34, \
+    k40, k41, k42, k43, k44, \
+    k50, k51, k52, k53, k54, \
+    k60, k61, k62, k63, k64 \
+)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    /* Base */
-    // ANDROID MAP
-    [LAYER_ANDROID] = LAYOUT(
-                               TO(LAYER_ALT)  , HYPR(ANVIL_MAP_01), HYPR(ANVIL_MAP_02), HYPR(ANVIL_MAP_03),
-                                                HYPR(ANVIL_MAP_04), HYPR(ANVIL_MAP_05), ANDROID_HOVER,
-        HYPR(ANVIL_MAP_07), HYPR(ANVIL_MAP_08), HYPR(ANVIL_MAP_09), HYPR(ANVIL_MAP_10), HYPR(ANVIL_MAP_11),
-        HYPR(ANVIL_MAP_12), HYPR(ANVIL_MAP_13), HYPR(ANVIL_MAP_14), HYPR(ANVIL_MAP_15), HYPR(ANVIL_MAP_16),
-        HYPR(ANVIL_MAP_17), HYPR(ANVIL_MAP_18), HYPR(ANVIL_MAP_19), HYPR(ANVIL_MAP_20), HYPR(ANVIL_MAP_21),
-        HYPR(ANVIL_MAP_22), HYPR(ANVIL_MAP_23), HYPR(ANVIL_MAP_24), HYPR(ANVIL_MAP_25), HYPR(ANVIL_MAP_26),
-        HYPR(ANVIL_MAP_27), HYPR(ANVIL_MAP_28), HYPR(ANVIL_MAP_29), HYPR(ANVIL_MAP_30), HYPR(ANVIL_MAP_31)
+    [LAYER_DEMO] = ANVIL_KEYMAP(
+        ANVIL_LYR, DEMO_ENC_B, DEMO_ENC_C, DEMO_ENC_D,
+                   DEMO_RGB_E, DEMO_RGB_F, DEMO_RGB_G,
+        DEMO_H, DEMO_I, DEMO_J, DEMO_K, DEMO_L,
+        DEMO_M, DEMO_N, DEMO_O, DEMO_P, DEMO_Q,
+        DEMO_R, DEMO_S, DEMO_T, DEMO_U, DEMO_V,
+        DEMO_W, DEMO_X, DEMO_Y, DEMO_Z, DEMO_1,
+        DEMO_2, DEMO_3, DEMO_4, DEMO_5, DEMO_6
     ),
-    // SECONDARY LAYER MAP
-    [LAYER_ALT] = LAYOUT(
-                               TO(LAYER_DOTA),  LCAG(ANVIL_MAP_01), LCAG(ANVIL_MAP_02), LCAG(ANVIL_MAP_03),
-                                                LCAG(ANVIL_MAP_04), LCAG(ANVIL_MAP_05), ALT_HOVER,
-        LCAG(ANVIL_MAP_07), LCAG(ANVIL_MAP_08), LCAG(ANVIL_MAP_09), LCAG(ANVIL_MAP_10), LCAG(ANVIL_MAP_11),
-        LCAG(ANVIL_MAP_12), LCAG(ANVIL_MAP_13), LCAG(ANVIL_MAP_14), LCAG(ANVIL_MAP_15), LCAG(ANVIL_MAP_16),
-        LCAG(ANVIL_MAP_17), LCAG(ANVIL_MAP_18), LCAG(ANVIL_MAP_19), LCAG(ANVIL_MAP_20), LCAG(ANVIL_MAP_21),
-        LCAG(ANVIL_MAP_22), LCAG(ANVIL_MAP_23), LCAG(ANVIL_MAP_24), LCAG(ANVIL_MAP_25), LCAG(ANVIL_MAP_26),
-        LCAG(ANVIL_MAP_27), LCAG(ANVIL_MAP_28), LCAG(ANVIL_MAP_29), LCAG(ANVIL_MAP_30), LCAG(ANVIL_MAP_31)
+#if 0 // LAYER_DOTA (commented out)
+    [LAYER_DOTA] = ANVIL_KEYMAP(
+        ANVIL_LYR, DOTA_ENC_B_PRESS, DOTA_ENC_C_PRESS, DOTA_ENC_D_PRESS,
+                   DOTA_RGB_E_PRESS, DOTA_RGB_F_PRESS, DOTA_HOVER,
+        DOTA_H, DOTA_I, DOTA_J, DOTA_K, DOTA_L,
+        DOTA_M, DOTA_N, DOTA_O, DOTA_P, DOTA_Q,
+        DOTA_R, DOTA_S, DOTA_T, DOTA_U, DOTA_V,
+        DOTA_W, DOTA_X, DOTA_Y, DOTA_Z, DOTA_1,
+        DOTA_2, DOTA_3, DOTA_4, DOTA_5, DOTA_6
     ),
-    // DOTA LAYER MAP
-    [LAYER_DOTA] = LAYOUT(
-                            TO(LAYER_ANDROID), KC__MUTE           , DOTA_PAUSE        , DOTA_TYPE_ITEM    ,
-                                               DOTA_FOCUS_UNITS   , DOTA_FOCUS_HERO   , DOTA_HOVER        ,
-        DOTA_SPELL1       , DOTA_SPELL2      , DOTA_SPELL3        , KC_NO             , DOTA_ULTIMATE     ,
-        DOTA_ITEM_01      , DOTA_ITEM_02     , DOTA_ITEM_03       , DOTA_CHATWHEEL    , DOTA_TP           ,
-        DOTA_ITEM_04      , DOTA_ITEM_05     , DOTA_ITEM_06       , KC_NO             , KC_NO             ,
-        KC_NO             , KC_NO            , KC_NO              , KC_NO             , KC_NO             ,
-        KC_NO             , KC_NO            , KC_NO              , DOTA_SHIFT        , DOTA_DENY
+#endif
+    [LAYER_RASPBERRY] = ANVIL_KEYMAP(
+        ANVIL_LYR, RASPBERRY_ENC_B_PRESS, RASPBERRY_ENC_C_PRESS, RASPBERRY_ENC_D_PRESS,
+                   RASPBERRY_E, RASPBERRY_F, RASPBERRY_HOVER,
+        RASPBERRY_H, RASPBERRY_I, RASPBERRY_J, RASPBERRY_K, RASPBERRY_L,
+        RASPBERRY_M, RASPBERRY_N, RASPBERRY_O, RASPBERRY_P, RASPBERRY_Q,
+        RASPBERRY_R, RASPBERRY_S, RASPBERRY_T, RASPBERRY_U, RASPBERRY_V,
+        RASPBERRY_W, RASPBERRY_X, RASPBERRY_Y, RASPBERRY_Z, RASPBERRY_1,
+        RASPBERRY_2, RASPBERRY_3, RASPBERRY_4, RASPBERRY_5, RASPBERRY_6
     ),
-    // HOVER LAYER MAP
-    [LAYER_HOVER] = LAYOUT(
-                            KC_NO            , KC_NO              , KC_NO             , KC_NO             ,
-                                               KC_NO              , KC_NO             , KC_NO             ,
-        KC_NO             , KC_NO            , KC_NO              , KC_NO             , KC_NO             ,
-        KC_NO             , KC_NO            , KC_NO              , KC_NO             , KC_NO             ,
-        KC_NO             , KC_NO            , KC_NO              , KC_NO             , KC_NO             ,
-        KC_NO             , KC_NO            , KC_NO              , KC_NO             , KC_NO             ,
-        KC_NO             , KC_NO            , SCREEN_ON          , SCREEN_OFF        , RGB_TOG
+    [LAYER_ANDROID] = ANVIL_KEYMAP(
+        ANVIL_LYR, ANDROID_ENC_B_PRESS, ANDROID_ENC_C_PRESS, ANDROID_ENC_D_PRESS,
+                   ANDROID_E, ANDROID_F, ANDROID_HOVER,
+        ANDROID_H, ANDROID_I, ANDROID_J, ANDROID_K, ANDROID_L,
+        ANDROID_M, ANDROID_N, ANDROID_O, ANDROID_P, ANDROID_Q,
+        ANDROID_R, ANDROID_S, ANDROID_T, ANDROID_U, ANDROID_V,
+        ANDROID_W, ANDROID_X, ANDROID_Y, ANDROID_Z, ANDROID_1,
+        ANDROID_2, ANDROID_3, ANDROID_4, ANDROID_5, ANDROID_6
+    ),
+    [LAYER_SCRIPTS] = ANVIL_KEYMAP(
+        ANVIL_LYR, SCRIPTS_ENC_B_PRESS, SCRIPTS_ENC_C_PRESS, SCRIPTS_ENC_D_PRESS,
+                   SCRIPTS_E, SCRIPTS_F, SCRIPTS_HOVER,
+        SCRIPTS_H, SCRIPTS_I, SCRIPTS_J, SCRIPTS_K, SCRIPTS_L,
+        SCRIPTS_M, SCRIPTS_N, SCRIPTS_O, SCRIPTS_P, SCRIPTS_Q,
+        SCRIPTS_R, SCRIPTS_S, SCRIPTS_T, SCRIPTS_U, SCRIPTS_V,
+        SCRIPTS_W, SCRIPTS_X, SCRIPTS_Y, SCRIPTS_Z, SCRIPTS_1,
+        SCRIPTS_2, SCRIPTS_3, SCRIPTS_4, SCRIPTS_5, SCRIPTS_6
+    ),
+    [LAYER_HOVER] = ANVIL_KEYMAP(
+        KC_NO, KC_NO, KC_NO, KC_NO,
+               KC_NO, KC_NO, KC_NO,
+        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO, KC_NO, KC_NO, KC_NO, HOVER_1,
+        KC_NO, KC_NO, KC_NO, HOVER_5, HOVER_6
     ),
 };
 
-#ifdef OLED_ENABLE
-#include <stdio.h>
-
-oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-    return OLED_ROTATION_180;  // flips the display 180 degrees if offhand
+static void demo_rgb_apply(uint8_t rgb_index) {
+    static const uint8_t led_indices[] = {DEMO_RGB_LED_E, DEMO_RGB_LED_F, DEMO_RGB_LED_G};
+    rgblight_sethsv_at(demo_rgb_hue[rgb_index], 255, RGBLIGHT_LIMIT_VAL, led_indices[rgb_index]);
 }
 
-void update_element(void) {
-    switch (dotaItemIndex) {
-        case 0:
-            oled_write_ln_P(PSTR(ARCANE_BOOTS), false);
-        break;
-        case 1:
-            oled_write_ln_P(PSTR(QUELLING_BLADE), false);
-        break;
-        case 2:
-            oled_write_ln_P(PSTR(AGHANIMS_SCEPTER), false);
-        break;
-        case 3:
-            oled_write_ln_P(PSTR(REFRESHER_ORB), false);
-        break;
-        case 4:
-            oled_write_ln_P(PSTR(OCTARINE_CORE), false);
-        break;
-        case 5:
-            oled_write_ln_P(PSTR(BLACK_KING_BAR), false);
-        break;
-        case 6:
-            oled_write_ln_P(PSTR(KAYA_AND_SANGE), false);
-        break;
-        case 7:
-            oled_write_ln_P(PSTR(LINKENS_SPHERE), false);
-        break;
-        case 8:
-            oled_write_ln_P(PSTR(SCYTHE_OF_VYSE), false);
-        break;
-  }
+static void demo_rgb_cycle(uint8_t rgb_index) {
+    demo_rgb_hue[rgb_index] = (demo_rgb_hue[rgb_index] + RGBLIGHT_HUE_STEP) % 256;
+    demo_rgb_apply(rgb_index);
+}
+
+#ifdef OLED_ENABLE
+
+static void oled_show_text_centered(const char *text) {
+    uint8_t len = strlen(text);
+    uint8_t col = len < 21 ? (21 - len) / 2 : 0;
+
+    oled_clear();
+    oled_set_cursor(col, 3);
+    oled_write(text, false);
+}
+
+static void demo_oled_show_text(const char *text) {
+    oled_show_text_centered(text);
+}
+
+static void demo_oled_show_char(char label) {
+    char buf[2] = {label, '\0'};
+    demo_oled_show_text(buf);
 }
 
 void oled_render_layer_state(uint8_t layer) {
-// void oled_task_user(void) {
-    oled_write_P(PSTR("Layer: "), false);
     switch (layer) {
-        case LAYER_ANDROID:
-            oled_write_ln_P(PSTR("Android\n"), false);
+        case LAYER_DEMO:
+            oled_show_text_centered("Demo");
             break;
-        case LAYER_ALT:
-            oled_write_ln_P(PSTR("Alternate\n"), false);
-            break;
+#if 0 // LAYER_DOTA (commented out)
         case LAYER_DOTA:
-            oled_write_ln_P(PSTR("DotA\n"), false);
-            oled_write_ln_P(PSTR("  Current Item: \n"), false);
-            update_element();
+            oled_show_text_centered("Dota");
+            break;
+#endif
+        case LAYER_RASPBERRY:
+            oled_show_text_centered("Pi");
+            break;
+        case LAYER_ANDROID:
+            oled_show_text_centered("Android");
+            break;
+        case LAYER_SCRIPTS:
+            oled_show_text_centered("Scripts");
             break;
         case LAYER_HOVER:
-            oled_write_ln_P(PSTR("Keeb\n"), false);
+            oled_show_text_centered("Hover");
             break;
     }
 }
 
-void render_bootmagic_status(bool status) {
-    /* Show Ctrl-Gui Swap options */
-    static const char PROGMEM logo[][2][3] = {
-        {{0x97, 0x98, 0}, {0xb7, 0xb8, 0}},
-        {{0x95, 0x96, 0}, {0xb5, 0xb6, 0}},
-    };
-    if (status) {
-        oled_write_ln_P(logo[0][0], false);
-        oled_write_ln_P(logo[0][1], false);
-    } else {
-        oled_write_ln_P(logo[1][0], false);
-        oled_write_ln_P(logo[1][1], false);
-    }
+void oled_refresh(void) {
+    oled_render_layer_state(get_highest_layer(layer_state));
 }
 
-void oled_render_logo(void) {
-    const char* logo_data = android_logo;
-    uint8_t current_layer = biton32(layer_state);
-    switch (current_layer) {
-        case LAYER_ANDROID:
-            logo_data = android_logo;
-            break;
-        case LAYER_ALT:
-            logo_data = tiger_logo;
-            break;
-        case LAYER_DOTA:
-            logo_data = dota_logo;
-            break;
-    }
-    oled_write_raw_P(logo_data, sizeof(logo_data));
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    return OLED_ROTATION_180;
 }
 #endif // OLED_ENABLE
 
-void oled_refresh(void) {
-    #ifdef OLED_ENABLE
-    oled_clear();
-    // oled_render_logo();
-    oled_render_layer_state(biton32(layer_state));
-    #endif
-}
-
-void oled_display_non_functional(void) {
-    #ifdef OLED_ENABLE
-    oled_clear();
-    oled_write_P(PSTR("~~ Power Off ~~\n"), false);
-    #endif
-}
-
 void oled_turn_screen_off(void) {
-    #ifdef OLED_ENABLE
+#ifdef OLED_ENABLE
     oled_off();
-    #endif
+#endif
 }
 
 void oled_turn_screen_on(void) {
-    #ifdef OLED_ENABLE
+#ifdef OLED_ENABLE
     oled_on();
-    #endif
+#endif
 }
 
-void encoder_map_dota(uint8_t key_code) {
-    switch(key_code) {
-        case ANVIL_MAP_32: // encoder 1 clockwise
-        break;
-        case ANVIL_MAP_33: // encoder 1 anti clockwise
-        break;
-        case ANVIL_MAP_34: // encoder 2 clockwise
-        break;
-        case ANVIL_MAP_35: // encoder 2 anti clockwise
-        break;
-        case ANVIL_MAP_36: // encoder 3 clockwise
+static void encoder_update_android(uint8_t index, bool clockwise) {
+    if (index == 0) {
+        tap_code16(clockwise ? ADB_TB_NEXT : ADB_TB_PREV);
+    } else if (index == 1) {
+        tap_code16(clockwise ? ADB_TB_VOLU : ADB_TB_VOLD);
+    }
+}
+
+static void encoder_update_scripts(uint8_t index, bool clockwise) {
+    if (index == 0) {
+        send_string(clockwise ? ADB_TB_NEXT_SCRIPT : ADB_TB_PREV_SCRIPT);
+        tap_code(KC_ENTER);
+    } else if (index == 1) {
+        send_string(clockwise ? ADB_TB_VOLU_SCRIPT : ADB_TB_VOLD_SCRIPT);
+        tap_code(KC_ENTER);
+    }
+}
+
+#if 0 // LAYER_DOTA (commented out)
+static void encoder_update_dota(uint8_t index, bool clockwise) {
+    if (index == 0) {
+        if (clockwise) {
             dota_item_increase();
-            oled_refresh();
-        break;
-        case ANVIL_MAP_37: // encoder 3 anti clockwise
+        } else {
             dota_item_decrease();
-            oled_refresh();
-        break;
+        }
     }
 }
+#endif
 
-void perform_encoder_action_with_code(uint8_t key_code) {
-    uint8_t current_layer = biton32(layer_state);
-    switch (current_layer) {
-        case LAYER_ANDROID:
-            tap_code16(HYPR(key_code));
-            break;
-        case LAYER_ALT:
-            tap_code16(LCAG(key_code));
-            break;
-        case LAYER_DOTA:
-            encoder_map_dota(key_code);
-            break;
+static void encoder_update_demo(uint8_t index, bool clockwise) {
+#ifdef OLED_ENABLE
+    static const char encoder_labels[] = {'B', 'C', 'D'};
+    if (index < 3) {
+        char text[3];
+        text[0] = encoder_labels[index];
+        text[1] = clockwise ? '+' : '-';
+        text[2] = '\0';
+        demo_oled_show_text(text);
     }
+#else
+    (void)index;
+    (void)clockwise;
+#endif
 }
 
 bool encoder_update_user(uint8_t encoder_index, bool clockwise) {
-    uint8_t key_code = ANVIL_MAP_32;
-    switch(encoder_index) {
-        case ENCODER_1:
-            if (!clockwise) {
-                key_code = ANVIL_MAP_33;
-            }
-            perform_encoder_action_with_code(key_code);
+    switch (get_highest_layer(layer_state)) {
+        case LAYER_DEMO:
+            encoder_update_demo(encoder_index, clockwise);
             break;
-        case ENCODER_2:
-            key_code = ANVIL_MAP_34;
-            if (!clockwise) {
-                key_code = ANVIL_MAP_35;
-            }
-            perform_encoder_action_with_code(key_code);
+#if 0 // LAYER_DOTA (commented out)
+        case LAYER_DOTA:
+            encoder_update_dota(encoder_index, clockwise);
             break;
-        case ENCODER_3:
-            key_code = ANVIL_MAP_36;
-            if (!clockwise) {
-                key_code = ANVIL_MAP_37;
-            }
-            perform_encoder_action_with_code(key_code);
+#endif
+        case LAYER_ANDROID:
+            encoder_update_android(encoder_index, clockwise);
             break;
-        }
-    //oled_refresh();
+        case LAYER_SCRIPTS:
+            encoder_update_scripts(encoder_index, clockwise);
+            break;
+        default:
+            break;
+    }
     return true;
 }
 
-// const rgblight_segment_t PROGMEM my_capslock_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-//     {6, 1, HSV_RED}       // Light 1 LEDs, starting with LED 6
-// );
-const rgblight_segment_t PROGMEM anvil_layer_layer_caps[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 9, HSV_BLUE},
-    {12, 1, HSV_BLUE}, // these 2 are the underglow
-    {9, 1, HSV_BLUE}, // C
-    {10, 1, HSV_BLUE}, // B
-    {11, 1, HSV_BLUE} // A
+const rgblight_segment_t PROGMEM anvil_layer_demo[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 9, HSV_CYAN}, {12, 1, HSV_CYAN}, {9, 1, HSV_CYAN}, {10, 1, HSV_CYAN}, {11, 1, HSV_CYAN}
 );
-const rgblight_segment_t PROGMEM anvil_layer_layer0[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 9, HSV_GREEN},
-    {12, 1, HSV_GREEN}, // these 2 are the underglow
-    {9, 1, HSV_BLUE}, // C
-    {10, 1, HSV_RED}, // B
-    {11, 1, HSV_YELLOW} // A
+#if 0 // LAYER_DOTA (commented out)
+const rgblight_segment_t PROGMEM anvil_layer_dota[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 9, HSV_RED}, {12, 1, HSV_RED}, {9, 1, HSV_RED}, {10, 1, HSV_RED}, {11, 1, HSV_RED}
 );
-const rgblight_segment_t PROGMEM anvil_layer_layer1[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 9, HSV_YELLOW},
-    {12, 1, HSV_YELLOW}, // these 2 are the underglow
-    {9, 1, HSV_GREEN}, // C
-    {10, 1, HSV_GOLDENROD}, // B
-    {11, 1, HSV_TEAL} // A
+#endif
+const rgblight_segment_t PROGMEM anvil_layer_raspberry[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 9, HSV_GREEN}, {12, 1, HSV_GREEN}, {9, 1, HSV_GREEN}, {10, 1, HSV_GREEN}, {11, 1, HSV_GREEN}
 );
-const rgblight_segment_t PROGMEM anvil_layer_layer2[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 9, HSV_RED},
-    {12, 1, HSV_RED}, // these 2 are the underglow
-    {9, 1, HSV_AZURE}, // C
-    {10, 1, HSV_GOLDENROD}, // B
-    {11, 1, HSV_TEAL} // A
+const rgblight_segment_t PROGMEM anvil_layer_android[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 9, HSV_WHITE}, {12, 1, HSV_WHITE}, {9, 1, HSV_BLUE}, {10, 1, HSV_RED}, {11, 1, HSV_YELLOW}
 );
-const rgblight_segment_t PROGMEM anvil_layer_layer3[] = RGBLIGHT_LAYER_SEGMENTS(
-    {0, 9, HSV_WHITE},
-    {12, 1, HSV_WHITE}, // these 2 are the underglow
-    {9, 1, HSV_WHITE}, // C
-    {10, 1, HSV_WHITE}, // B
-    {11, 1, HSV_WHITE} // A
+const rgblight_segment_t PROGMEM anvil_layer_scripts[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 9, HSV_YELLOW}, {12, 1, HSV_YELLOW}, {9, 1, HSV_GREEN}, {10, 1, HSV_GOLDENROD}, {11, 1, HSV_TEAL}
+);
+const rgblight_segment_t PROGMEM anvil_layer_hover[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 9, HSV_WHITE}, {12, 1, HSV_WHITE}, {9, 1, HSV_WHITE}, {10, 1, HSV_WHITE}, {11, 1, HSV_WHITE}
 );
 
-// Now define the array of layers. Later layers take precedence
 const rgblight_segment_t* const PROGMEM anvil_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
-    anvil_layer_layer_caps,
-    anvil_layer_layer0,
-    anvil_layer_layer1,
-    anvil_layer_layer2,
-    anvil_layer_layer3
+    anvil_layer_demo,
+    anvil_layer_raspberry,
+    anvil_layer_android,
+    anvil_layer_scripts,
+    anvil_layer_hover
 );
 
 void keyboard_post_init_user(void) {
-    // Enable the LED layers
     rgblight_layers = anvil_rgb_layers;
+    rgblight_set_layer_state(1, true);
+    demo_rgb_apply(0);
+    demo_rgb_apply(1);
+    demo_rgb_apply(2);
+#ifdef OLED_ENABLE
+    oled_refresh();
+#endif
 }
 
-// bool led_update_user(led_t led_state) {
-//     rgblight_set_layer_state(0, led_state.caps_lock);
-//     return true;
-// }
-
 layer_state_t layer_state_set_user(layer_state_t state) {
-    rgblight_set_layer_state(1,  layer_state_cmp(state, LAYER_ANDROID));
-    rgblight_set_layer_state(2,  layer_state_cmp(state, LAYER_ALT));
-    rgblight_set_layer_state(3,  layer_state_cmp(state, LAYER_DOTA));
-    rgblight_set_layer_state(4,  layer_state_cmp(state, LAYER_HOVER));
+    rgblight_set_layer_state(1, layer_state_cmp(state, LAYER_DEMO));
+    rgblight_set_layer_state(2, layer_state_cmp(state, LAYER_RASPBERRY));
+    rgblight_set_layer_state(3, layer_state_cmp(state, LAYER_ANDROID));
+    rgblight_set_layer_state(4, layer_state_cmp(state, LAYER_SCRIPTS));
+    rgblight_set_layer_state(5, layer_state_cmp(state, LAYER_HOVER));
+#ifdef OLED_ENABLE
     oled_render_layer_state(get_highest_layer(state));
+#endif
     return state;
 }
 
+static bool demo_handle_plain_key(uint16_t keycode, keyrecord_t *record) {
+    if (!record->event.pressed) {
+        return false;
+    }
+
+    const demo_key_t *key = &demo_plain_keys[keycode - DEMO_H];
+    uint16_t          now = timer_read();
+
+    if (keycode == demo_last_key && TIMER_DIFF_16(now, demo_last_time) < GET_TAPPING_TERM(keycode, record)) {
+        tap_code16(key->keycode);
+        demo_last_key = 0;
+    } else {
+#ifdef OLED_ENABLE
+        demo_oled_show_char(key->label);
+#endif
+        demo_last_key  = keycode;
+        demo_last_time = now;
+    }
+
+    return false;
+}
+
+static bool demo_handle_rgb_key(uint16_t keycode, keyrecord_t *record, char label, uint8_t rgb_index) {
+    if (!record->event.pressed) {
+        return false;
+    }
+
+    uint16_t now = timer_read();
+
+    if (keycode == demo_last_key && TIMER_DIFF_16(now, demo_last_time) < GET_TAPPING_TERM(keycode, record)) {
+        demo_rgb_cycle(rgb_index);
+        demo_last_key = 0;
+    } else {
+#ifdef OLED_ENABLE
+        demo_oled_show_char(label);
+#endif
+        demo_last_key  = keycode;
+        demo_last_time = now;
+    }
+
+    return false;
+}
+
+static bool process_demo_key(uint16_t keycode, keyrecord_t *record) {
+    if (DEMO_PLAIN_IS(keycode)) {
+        return demo_handle_plain_key(keycode, record);
+    }
+
+    if (!record->event.pressed) {
+        switch (keycode) {
+            case DEMO_ENC_B:
+            case DEMO_ENC_C:
+            case DEMO_ENC_D:
+                return false;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    switch (keycode) {
+        case DEMO_ENC_B:
+#ifdef OLED_ENABLE
+            demo_oled_show_char('B');
+#endif
+            return false;
+        case DEMO_ENC_C:
+#ifdef OLED_ENABLE
+            demo_oled_show_char('C');
+#endif
+            return false;
+        case DEMO_ENC_D:
+#ifdef OLED_ENABLE
+            demo_oled_show_char('D');
+#endif
+            return false;
+        case DEMO_RGB_E:
+            return demo_handle_rgb_key(keycode, record, 'E', 0);
+        case DEMO_RGB_F:
+            return demo_handle_rgb_key(keycode, record, 'F', 1);
+        case DEMO_RGB_G:
+            return demo_handle_rgb_key(keycode, record, 'G', 2);
+    }
+
+    return true;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (keycode == ANVIL_LYR) {
+        if (record->event.pressed) {
+            layer_move(LAYER_NEXT(get_highest_layer(layer_state)));
+        }
+        return false;
+    }
+
+    if (get_highest_layer(layer_state) == LAYER_DEMO) {
+        if (!process_demo_key(keycode, record)) {
+            return false;
+        }
+    }
+
+#if 0 // LAYER_DOTA (commented out)
+    if (get_highest_layer(layer_state) == LAYER_DOTA && record->event.pressed && keycode == DOTA_TYPE_ITEM) {
+        send_string(dota_items[dotaItemIndex]);
+        return false;
+    }
+#endif
+
     if (!record->event.pressed) {
         return true;
     }
-    //oled_refresh();
+
     switch (keycode) {
-        case DOTA_TYPE_ITEM:
-            //tap_code16(LGUI(KC_A));
-            send_string(dota_items[dotaItemIndex]);
-        break;
         case SCREEN_OFF:
             oled_turn_screen_off();
-        break;
+            break;
         case SCREEN_ON:
             oled_turn_screen_on();
-        break;
+#ifdef OLED_ENABLE
+            oled_refresh();
+#endif
+            break;
+        case RASPBERRY_03:
+            tap_code16(LALT(KC_F2));
+            break;
+        case RASPBERRY_04:
+            send_string("lxterminal");
+            break;
+        case RASPBERRY_05:
+            send_string("hostname -I");
+            break;
+        case RASPBERRY_06:
+            tap_code(KC_BSPACE);
+            break;
+        case RASPBERRY_07:
+            send_string("sudo raspi-config");
+            break;
+        case RASPBERRY_08:
+            send_string("cat /etc/wpa_supplicant/wpa_supplicant.conf");
+            break;
+        case RASPBERRY_09:
+            send_string("sudo sh -c wpa_passphrase RouterOfEvil \"Zuhlke1234$\" > /etc/wpa_supplicant/wpa_supplicant.conf");
+            break;
+        case RASPBERRY_11:
+            send_string("wpa_passphrase RouterOfEvil \"Zuhlke1234$\" > ");
+            break;
+        case RASPBERRY_12:
+            send_string("iwlist wlan0 scan");
+            break;
+        case RASPBERRY_15:
+            send_string("sudo poweroff");
+            break;
+        case RASPBERRY_16:
+            tap_code16(LSFT(LCTL(KC_Q)));
+            break;
+        case RASPBERRY_17:
+            tap_code16(KC_ESCAPE);
+            break;
+        case RASPBERRY_18:
+            tap_code16(KC_ENTER);
+            break;
     }
-    return true;
-};
 
-void suspend_wakeup_init_user(void) {
-    //oled_refresh();
+    return true;
 }
 
 void suspend_power_down_user(void) {
-    oled_display_non_functional();
+#ifdef OLED_ENABLE
+    oled_off();
+#endif
+}
+
+void suspend_wakeup_init_user(void) {
+#ifdef OLED_ENABLE
+    oled_on();
+    oled_refresh();
+#endif
 }
